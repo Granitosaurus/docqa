@@ -1,0 +1,28 @@
+<div class="pure-menu pure-menu-horizontal">
+  <div class="pure-g"></div>
+  <div class="pure-u-2-5" id="left-header">
+    {% if doc_id %}
+      <a href="/" class="pure-menu-heading pure-menu-link">{{ file }}: {{ doc_id }}</a>
+      <ul class="pure-menu-list">
+      <li class="pure-menu-item">{% include "includes/pass.html" %}</li>
+      <li class="pure-menu-item">{% include "includes/fail.html" %}</li>
+      <li class="pure-menu-item">{% include "includes/rm.html" %}</li>
+    {% else %}
+      <a href="{{ url_for('qa_new', file=file)}}" class="pure-menu-heading pure-menu-link">{{ file }}: {{ doc_id }}</a>
+    {% endif %}
+    <li class="pure-menu-item"><a
+        title="get new document"
+        href="{{ url_for('qa_new', file=file, after=doc_id or 0, **request.args) }}"
+        class="pure-menu-link prev-page"><i class="fa fa-arrow-right" aria-hidden="true"></i>
+    </a></li>
+    </ul>
+  </div>
+  <div class="pure-u-3-5" id="right-header">
+    <ul class="pure-menu-list">
+      <li class="pure-menu-item"><a href="{{ url_for('show', file=file, status='pass') }}"
+                                    class="pure-menu-link prev-page">passed</a></li>
+      <li class="pure-menu-item"><a href="{{ url_for('show', file=file, status='fail') }}"
+                                    class="pure-menu-link prev-page">failed</a></li>
+    </ul>
+  </div>
+</div>

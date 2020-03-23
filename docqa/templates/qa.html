@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+  {% include "includes/header.html" %}
+  <div class="pure-g" id="content">
+    {% if doc %}
+      <div class="pure-u-2-5" id="left-pane">
+        <table class="pure-table pure-table-striped doc-{{ doc_qa['status'] }}">
+          <tbody>
+          {% set hidden_keys = url_get_listq('hide') %}
+          {% for key, value in doc.items() if key not in hidden_keys %}
+            <tr>
+              <td class="key-actions">
+                <a class="pure-menu-link action" href="{{ url_add_listq('hide', key) }}">
+                  <i class="fa fa-eye-slash" title="hide" aria-hidden="true"></i>
+                </a>
+                <a class="pure-menu-link action" href="javascript:comment('{{ key }}')">
+                  {% if doc_qa['comments'][key] %}
+                    <i class="fa fa-comment" title="{{ doc_qa['comments'][key] }}" aria-hidden="true"></i>
+                  {% else %}
+                    <i class="fa fa-comment-o" title="comment" aria-hidden="true"></i>
+                  {% endif %}
+                </a>
+              </td>
+              <td class="key">
+                <a class="pure-menu-link" href="{{ url_sub(display=key) }}"> {{ key }} </a>
+              </td>
+              <td class="value">
+                {{ value|trim()|truncate(200)|urlize }}
+              </td>
+            </tr>
+          {% endfor %}
+          {% if hidden_keys %}
+            <tr class="meta">
+              <td></td>
+              <td>hidden</td>
+              <td>
+                {% for key in hidden_keys %}
+                  <a class="link" href="{{ url_rm_listq('hide', key) }}">{{ key }}</a>
+                {% endfor %}
+              </td>
+            </tr>
+          {% endif %}
+          </tbody>
+        </table>
+      </div>
+      <div class="pure-u-3-5" id="right-pane">
+        <div class="pure-g" id="preview">
+          {% if doc[display] is iterable and doc[display] is not string %}
+            <ol>
+              [
+              {% for element in doc[display] %}
+                {% if element is mapping %}
+                  <li class="pure-u-1">
+                    <pre>{{ element|tojson(indent=2) }}</pre>
+                  </li>
+                {% else %}
+                  <li class="pure-u-1">{{ element|safe }}</li>
+                {% endif %}
+              {% endfor %}
+              ]
+            </ol>
+          {% elif is_url(doc[display]) %}
+            <div class="pure-u-1">
+              <iframe src="{{ url_for('render', url=doc[display]) }}" allowfullscreen>
+              </iframe>
+            </div>
+          {% else %}
+            <div class="pure-u-1">{{ doc[display]|safe }}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      <div class="pure-u-1 error"> ERROR: Unknown document id {{ doc_id }}</div>
+    {% endif %}
+  </div>
+  <script type="text/javascript">
+      // this function send a post request to file/id/field with comment taken from prompt
+      // comment "-" sends post to delete the comment
+      function comment(key) {
+          var c = prompt('comment (- to delete):');
+          if (c) {
+              if (c === '-') {
+                  c = ''
+              }
+              var f = document.createElement('form');
+              f.action = '{{ url_for("qa_comment", file=file, doc_id=doc_id, key="") }}' + key;
+              f.method = 'POST';
+
+              var i = document.createElement('input');
+              i.type = 'hidden';
+              i.name = 'comment';
+              i.value = c;
+              f.appendChild(i);
+
+              document.body.appendChild(f);
+              f.submit();
+          }
+      }
+
+      function preview_url(url) {
+          fetch(url).then(function (response) {
+              return response.text();
+          }).then(function (html) {
+              var preview = document.getElementById("preview");
+              preview.innerHTML = html
+              print();
+          })
+      }
+  </script>
+{% endblock content %}

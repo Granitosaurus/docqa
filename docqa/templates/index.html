@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+  <ul class="files pure-menu-list">
+    <li class="pure-menu-heading">Available Files:</li>
+    {% for file in files %}
+      <li class="pure-menu-item">
+        <div class="pure-g">
+          <div class="pure-u-5-6">
+            <a href="/qa/{{ file }}/1" class="pure-menu-link">{{ file }}</a>
+          </div>
+          <div class="pure-u-1-6">
+            <a href="/rm/{{ file }}" class="pure-menu-link"> X </a>
+          </div>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="pure-g actions">
+    <div class="pure-u-1">
+      <form class="pure-form" action="/add" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept="application/json" multiple class="pure-input">
+        <input type="submit" class="pure-button pure-button-primary">
+      </form>
+    </div>
+  </div>
+{% endblock content %}

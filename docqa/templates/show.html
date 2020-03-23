@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+  {% include "includes/header.html" %}
+  <div class="pure-g" id="content">
+  <div class="pure-u-1">
+    <table class="pure-table pure-table-striped">
+      <th>ID</th>
+      <th>comments</th>
+      <th>actions</th>
+      {% for doc in docs %}
+        {% set doc_id = doc.doc_id %}
+        {% set docqa = doc['_docqa'] %}
+        {% set comments = doc['_docqa']['comments'] %}
+        <tr>
+        <td><a href="{{ url_for('qa', file=file, doc_id=doc_id) }}"> {{ doc.doc_id }} </a></td>
+        <td> {% if comments %}{{ comments|tojson }}{% endif %}</td>
+        <td>
+          {% if docqa['status'] == 'pass' %}
+          {% include "includes/pass.html" %}
+          {% else %}
+          {% include "includes/fail.html" %}
+          {% endif %}
+        </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  </div>
+{% endblock content %}
